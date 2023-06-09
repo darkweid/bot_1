@@ -9,7 +9,7 @@ from config import Config, load_config
 
 config: Config = load_config()
 BOT_TOKEN: str = config.tg_bot.token
-# просто комментарий
+# просто коммент
 
 bot: Bot = Bot(token=BOT_TOKEN)
 dp: Dispatcher = Dispatcher()
