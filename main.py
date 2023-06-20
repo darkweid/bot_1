@@ -162,7 +162,6 @@ async def process_send_command(message: Message):
     for i in range(len(lst)):
         await bot.send_message(lst[i], 'privet')
 
-
 # Этот хэндлер будет срабатывать на команду "/start"
 @dp.message(Command(commands=["start"]))
 async def process_start_command(message: Message):
