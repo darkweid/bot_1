@@ -31,8 +31,12 @@ img_question5 = 'AgACAgIAAxkDAAIEl2SHGNYUVoId0bVIFpWtmOhcN86dAAJvyDEbvRE5SLt2jt5
 photo1 = 'AgACAgIAAxkDAAIEeWSHFhzfUTrsmjbf3S8acjj3ymCAAAJ3yDEbvRE5SIEPoGDXBAABZwEAAwIAA3kAAy8E'
 text_timer = 'Вы просили напомнить, и мы напоминаем 😉\n\nВы можете поиграть сейчас или можем напомнить ещё раз'
 
+img_svetlana, img_question1, img_question2, img_question3, img_question4, img_question5, img_guide = img_pass, img_pass, img_pass, img_pass, img_pass, img_pass, img_pass
+
 flag_signup = False
 flag_video = False
+flag_read = False
+flag_game = False
 # handler для копирования id файла
 file_ids = []
 user_first_name = ' '
@@ -73,7 +77,7 @@ dict_lex = {
 
 
 async def send_message_to_admin(dp: Dispatcher, text=None):
-    lst = [579649093, 6191802805]
+    lst = [579649093]
     for i in range(len(lst)):
         await bot.send_message(lst[i], text)
 
@@ -152,6 +156,13 @@ keyboard_video: InlineKeyboardMarkup = InlineKeyboardMarkup(inline_keyboard=[[bu
 keyboard_url: InlineKeyboardMarkup = types.InlineKeyboardMarkup(inline_keyboard=[[button_6_URL]])
 
 
+@dp.message(Command(commands=["sending1"]))
+async def process_send_command(message: Message):
+    lst = [579649093, 6191802805]
+    for i in range(len(lst)):
+        await bot.send_message(lst[i], 'privet')
+
+
 # Этот хэндлер будет срабатывать на команду "/start"
 @dp.message(Command(commands=["start"]))
 async def process_start_command(message: Message):
@@ -162,20 +173,28 @@ async def process_start_command(message: Message):
         log_data = [
             message.from_user.id, message.from_user.full_name,
             message.from_user.username, message.from_user.is_bot,
-            time.strftime('%H:%M %x'), time.tzname
+            time.strftime('%H:%M :: %d/%m/%Y'), time.tzname
         ]
         writer = csv.writer(log_file, delimiter=',')
         writer.writerow(log_data)
     await message.answer_photo(photo=img_svetlana,
                                caption=f"""Здравствуйте, {user_full_name}! \nМеня зовут Светлана Заиграева, я – педагог и основатель онлайн-школы, в которой мы помогаем детям и их родителям подготовиться к школе: научиться читать, считать и любить учиться.
 \nПоследние два года я изучала тему подготовки к школе не просто как учитель, но и как мама: мой сын в этом году будет поступать в школу.
-\nИ с вами я делюсь этой информацией <b>совершенно бесплатно</b>. Хотите узнать, что должен ребенок знать и уметь к поступлению в первый класс? """,
+\nИ с вами я делюсь этой информацией. Хотите узнать, что должен ребенок знать и уметь к поступлению в первый класс? """,
                                reply_markup=keyboard1)
 
 
 # Получить гайд
 @dp.callback_query(Text(text='Узнать'))
 async def process_guide_answer(callback: types.CallbackQuery):
+    with open('log_Узнать.csv', 'a', encoding='utf-8') as log_file:
+        log_data = [
+            callback.from_user.id, callback.from_user.full_name,
+            callback.from_user.username, callback.from_user.is_bot,
+            time.strftime('%H:%M :: %d/%m/%Y'), time.tzname
+        ]
+        writer = csv.writer(log_file, delimiter=',')
+        writer.writerow(log_data)
     await callback.message.answer_photo(photo=img_guide)
     await callback.answer()
     await asyncio.sleep(15)
@@ -183,10 +202,27 @@ async def process_guide_answer(callback: types.CallbackQuery):
 \nЧасто к нам приходят детки, которых уже учили читать. После неудачных попыток у ребенка формируются затруднения, которые мешают ему освоить этот навык.
 \nКак правило, это последствия одних и тех же ошибок, которые, к сожалению, допускают даже некоторые педагоги.
 \nДавайте, я расскажу вам про самые популярные ошибки и о том, как их избежать?""", reply_markup=keyboard1_1)
+    await asyncio.sleep(20)
+    if flag_read == False or (flag_read == True and flag_game == False): #'BAACAgIAAxkBAAIGfWSKD7Bk92UqhDUh8kPNTNVX2DoqAAJfKwAC90BQSFYMoFQJpBDKLwQ'
+        await callback.message.answer_video(img_pass)
+        await callback.message.answer(f"""Хотите, чтобы ребенок учился с таким же интересом?
+\nТогда приходите к нам 😊
+\nМы точно знаем, как сделать занятия полезными и интересными. Приходите к нам на бесплатный урок и убедитесь сами!""",
+                                      reply_markup=keyboard_signup)
 
 
 @dp.callback_query(Text(text='Читать'))
 async def process_guide_errors(callback: types.CallbackQuery):
+    global flag_read
+    flag_read = True
+    with open('log_Читать.csv', 'a', encoding='utf-8') as log_file:
+        log_data = [
+            callback.from_user.id, callback.from_user.full_name,
+            callback.from_user.username, callback.from_user.is_bot,
+            time.strftime('%H:%M :: %d/%m/%Y'), time.tzname
+        ]
+        writer = csv.writer(log_file, delimiter=',')
+        writer.writerow(log_data)
     global user_nick
     global user_full_name
     user_full_name = callback.from_user.full_name
@@ -214,7 +250,7 @@ async def process_guide_errors(callback: types.CallbackQuery):
 \nС этим я тоже могу помочь! И тоже бесплатно :)
 \nНачнем с чтения: самого важного навыка, именно от него зависит, насколько успешным и легким будет первый школьный год.
 \nПредложите вашему малышу сыграть в небольшую игру. В ней всего 10 заданий, на это уйдет не больше 10 минут.
-\nА тех, кто пройдет игру до конца ждёт небольшой подарок: бесплатное развивающее пособие "Курс по тренировке мозга на 21 день", который подойдет деткам от 5 до 7 лет.
+\nА тех, кто пройдет игру до конца ждёт небольшой подарок: <b>бесплатное развивающее пособие "Курс по тренировке мозга на 21 день"</b>, который подойдет деткам от 5 до 7 лет.
 \nКогда вы с малышом будете готовы, нажимайте на кнопку ниже
 Или мы можем напомнить через нужное вам время
 """,
@@ -249,6 +285,18 @@ async def process_game_timer24(callback: types.CallbackQuery):
 # Играть
 @dp.callback_query(Text(text='Играть'))
 async def process_game_answer(callback: types.CallbackQuery):
+    global flag_game
+    flag_game = True
+    with open('log_Играть.csv', 'a', encoding='utf-8') as log_file:
+        log_data = [
+            callback.from_user.id, callback.from_user.full_name,
+            callback.from_user.username, callback.from_user.is_bot,
+            time.strftime('%H:%M :: %d/%m/%Y'), time.tzname
+        ]
+        writer = csv.writer(log_file, delimiter=',')
+        writer.writerow(log_data)
+    global user_first_name
+    user_first_name = callback.from_user.first_name
     await callback.message.answer(text='Выберите количество баллов за выполненные задания при помощи кнопок')
     await callback.message.answer_photo(photo=img_question1,
                                         reply_markup=keyboard3)
@@ -262,6 +310,7 @@ async def process_game_answer3(callback: types.CallbackQuery):
     global flag_signup
     global flag_video
     global user_first_name
+    user_first_name = callback.from_user.first_name
     counter += int(callback.data.split()[-1])
     await callback.message.edit_reply_markup(reply_markup=keyboard3_3)
     if quest_id == 0:  # кнопка срабатывает первый раз
@@ -342,6 +391,14 @@ async def process_game_answer2(callback: types.CallbackQuery):
 
 @dp.callback_query(Text(text='signup_pressed'))
 async def callbacks_num(callback: types.CallbackQuery):
+    with open('log_Регистрация.csv', 'w', encoding='utf-8') as log_file:
+        log_data = [
+            callback.from_user.id, callback.from_user.full_name,
+            callback.from_user.username, callback.from_user.is_bot,
+            time.strftime('%H:%M :: %d/%m/%Y'), time.tzname
+        ]
+        writer = csv.writer(log_file, delimiter=',')
+        writer.writerow(log_data)
     global flag_signup
     global user_nick
     global user_full_name
@@ -359,6 +416,14 @@ async def process_result_help(message: Message):
 
 @dp.message(Text(text='Смотреть видео'))
 async def process_result_answer(message: Message):
+    with open('log_Видео.csv', 'a', encoding='utf-8') as log_file:
+        log_data = [
+            callback.from_user.id, callback.from_user.full_name,
+            callback.from_user.username, callback.from_user.is_bot,
+            time.strftime('%H:%M :: %d/%m/%Y'), time.tzname
+        ]
+        writer = csv.writer(log_file, delimiter=',')
+        writer.writerow(log_data)
     global flag_video
     await message.answer_video('BAACAgIAAxkBAAIGfWSKD7Bk92UqhDUh8kPNTNVX2DoqAAJfKwAC90BQSFYMoFQJpBDKLwQ',
                                reply_markup=keyboard_help)

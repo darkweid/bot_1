@@ -1,7 +1,13 @@
-##.env
+.env
 
 .idea/
 .mypy_cache/
 .vscode/
 venv/
 __pycache__/
+log.csv
+log_Играть.csv
+log_Регистрация.csv
+log_Узнать.csv
+log_Читать.csv
+log_Видео.csv
